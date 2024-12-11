@@ -23,7 +23,7 @@ const Home = () => {
     const [editProject, setEditProject] = useState(null);  // State to manage the project being edited
     const [editedName, setEditedName] = useState('');
 
-    const apiUrl = 'http://localhost/crud-api/index.php';
+    const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
 
     useEffect(() => {
         axios.get(apiUrl).then((res) => setProjects(res.data));

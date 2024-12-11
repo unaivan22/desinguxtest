@@ -54,7 +54,7 @@ const Tasks = () => {
       });
     
 
-    const apiUrl = 'http://localhost/crud-api/index.php';
+    const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
 
     useEffect(() => {
         const fetchData = async () => {
