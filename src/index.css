@@ -8,9 +8,14 @@
 *{
   font-family: "Albert Sans", sans-serif;
 }
-body{
+
+/* html.light{
   background-color: #ececec !important;
 }
+
+html.dark{
+  background-color: #e62828 !important;
+} */
 
 @layer base {
   :root {
