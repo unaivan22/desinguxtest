@@ -429,30 +429,33 @@ const Tasks = () => {
                         <TableCell className="font-medium ">
                             <div className='flex flex-col'>
                               <div className='flex gap-3 items-center'>
-                                  <div>
-                                  {task.image && (
-                                      <ModalImage
-                                          small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                          large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                          // alt={task.name}
-                                          className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
-                                      />
-                                  )}
-                                  </div>
-                                  <p className='line-clamp-[2] w-[90%] font-medium opacity-70 my-2'>{task.name}</p>
+                                <div>
+                                {task.image && (
+                                    <ModalImage
+                                        small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                        large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                        // alt={task.name}
+                                        className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
+                                    />
+                                )}
                                 </div>
-                                <p className='font-light text-xs opacity-70 flex items-center gap-1 mt-1'> 
-                                  <TooltipProvider>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <Clock className='w-4 h-4 opacity-80' />
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>Tanggal dibuat</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
-                                   {formatDate(task.created_at)}</p>
+                                <div className='flex flex-col gap-2 w-[300px] md:w-[90%]'>
+                                  <p className='line-clamp-[1] font-medium opacity-70'>{task.name}</p>
+                                  <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Clock className='w-4 h-4 opacity-80' />
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>Tanggal dibuat</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </TooltipProvider>
+                                    {formatDate(task.created_at)}</p>
+                                </div>
+                              </div>
+                                
                             </div>
                         </TableCell>
                         <TableCell>
