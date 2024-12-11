@@ -12,7 +12,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUpRight, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Loader, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ModalImage from 'react-modal-image';
 import {
@@ -52,7 +52,9 @@ const Tasks = () => {
         ongoing: 0,
         pending: 0,
       });
-    
+  
+    const [loading, setLoading] = useState(false);
+
 
     const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
 
@@ -80,23 +82,39 @@ const Tasks = () => {
         fetchData();
     }, [projectId]);
     
-    
-
     const handleSubmit = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('name', form.name);
-        formData.append('project_id', projectId);
-        if (form.image) {
-            formData.append('image', form.image);
-        }
-    
-        axios.post(apiUrl, formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then((res) => {
-            setTasks([...tasks, { id: res.data.id, name: form.name, status: 'pending', image: form.image ? URL.createObjectURL(form.image) : null }]);
-            setForm({ name: '', image: null });
-        });
-        window.location.reload();
-    };
+      e.preventDefault();
+      
+      // Set loading to true when the upload starts
+      setLoading(true);
+  
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('project_id', projectId);
+      if (form.image) {
+          formData.append('image', form.image);
+      }
+  
+      axios.post(apiUrl, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+          .then((res) => {
+              // Add the new task to the list
+              setTasks([...tasks, { id: res.data.id, name: form.name, status: 'pending', image: form.image ? URL.createObjectURL(form.image) : null }]);
+              
+              // Clear the form fields
+              setForm({ name: '', image: null });
+  
+              // Reload the page to reflect the changes
+              window.location.reload();
+          })
+          .catch((error) => {
+              console.error("Error uploading the data:", error);
+          })
+          .finally(() => {
+              // Set loading to false after the upload is done
+              setLoading(false);
+          });
+  };
+  
 
     const handleStatusChange = (id, status) => {
         axios
@@ -208,14 +226,16 @@ const Tasks = () => {
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
+                    disabled={loading}
                 />
                 <Input
                     className="p-2 border rounded-lg w-[250px]"
                     type="file"
                     accept="image/*"
                     onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                    disabled={loading}
                 />
-                <Button className="rounded-lg">Add Task</Button>
+                <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Add Task</Button>
             </form>
             <div className='flex w-full gap-x-48 items-start'>
                 <div className='flex gap-x-2 w-full'>
