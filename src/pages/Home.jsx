@@ -76,7 +76,7 @@ const Home = () => {
                 <Input
                     className="p-2 border rounded-lg"
                     type="text"
-                    placeholder="Project Name"
+                    placeholder="Nama Project"
                     value={form.name}
                     onChange={(e) => setForm({ name: e.target.value })}
                     required

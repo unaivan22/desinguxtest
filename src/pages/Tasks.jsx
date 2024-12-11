@@ -12,7 +12,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUpRight, Loader, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Clock, Loader, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ModalImage from 'react-modal-image';
 import {
@@ -34,6 +34,12 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 
 const Tasks = () => {
     const { projectId } = useParams();
@@ -51,6 +57,11 @@ const Tasks = () => {
         completed: 0,
         ongoing: 0,
         pending: 0,
+      });
+
+    const [pelaporCounts, setPelaporCounts] = useState({
+        ivan: 0,
+        drajat: 0,
       });
   
     const [loading, setLoading] = useState(false);
@@ -132,10 +143,25 @@ const Tasks = () => {
             });
     };
     
+    const handlePelaporChange = async (id, pelapor) => {
+      try {
+          await axios.put(apiUrl, { id, pelapor });
+          
+          // Update the local tasks state
+          setTasks((prevTasks) =>
+              prevTasks.map((task) =>
+                  task.id === id ? { ...task, pelapor } : task
+              )
+          );
+      } catch (error) {
+          console.error("Failed to update pelapor:", error);
+          alert("Failed to update pelapor. Please try again.");
+      }
+  };  
 
     const handleDelete = (id) => {
         // Show a confirmation alert before proceeding with the delete action
-        const isConfirmed = window.confirm('Yakin ingin donwload task ini?');
+        const isConfirmed = window.confirm('Yakin ingin hapus task ini?');
     
         if (isConfirmed) {
             // Proceed with the delete request if confirmed
@@ -212,56 +238,115 @@ const Tasks = () => {
       const completedPercentage = totalTasks ? (statusCounts.completed / totalTasks) * 100 : 0;
       const ongoingPercentage = totalTasks ? (statusCounts.ongoing / totalTasks) * 100 : 0;
       const pendingPercentage = totalTasks ? (statusCounts.pending / totalTasks) * 100 : 0;
+
+
+      useEffect(() => {
+        // Count tasks based on status
+        const counts = { ivan: 0, drajat: 0};
+        tasks.forEach(task => {
+          if (task.pelapor === 'ivan') {
+            counts.ivan += 1;
+          } else if (task.pelapor === 'drajat') {
+            counts.drajat += 1;
+          }
+        });
+        setPelaporCounts(counts);
+      }, [tasks]);
     
+      // Calculate total number of tasks
+      const totalPelaporTasks = tasks.length;
+      const ivanPelaporPercentage = totalPelaporTasks ? (pelaporCounts.ivan / totalPelaporTasks) * 100 : 0;
+      const drajatPelaporPercentage = totalPelaporTasks ? (pelaporCounts.drajat / totalPelaporTasks) * 100 : 0;
+    
+      const formatDate = (dateString) => {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const date = new Date(dateString);
+        
+        const day = date.getDate();
+        const month = months[date.getMonth()];  // Get month name in Indonesian
+        const year = date.getFullYear();
+        const time = date.toLocaleTimeString('en-GB'); // Use en-GB for 24-hour format
+    
+        return `${day} ${month} ${year} (${time})`;
+    };
 
 
     return (
         <div className="container min-h-screen py-12">
             <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
-            <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4">
                 <Input
                     className="p-2 border rounded-lg"
                     type="text"
-                    placeholder="Task Name"
+                    placeholder="Nama task"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
                     disabled={loading}
                 />
-                <Input
-                    className="p-2 border rounded-lg w-[250px]"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-                    disabled={loading}
-                />
-                <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Add Task</Button>
+                <div className='flex flex-col md:flex-row gap-2'>
+                  <Input
+                      className="p-2 border rounded-lg w-full md:w-[250px]"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                      disabled={loading}
+                  />
+                  <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
+                </div>
             </form>
-            <div className='flex w-full gap-x-48 items-start'>
+            <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
                 <div className='flex gap-x-2 w-full'>
                   <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link>
                   <Input
                       type="search"
-                      placeholder="Search tasks..."
+                      placeholder="Cari tasks..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="p-2 border rounded mb-4 rounded-lg max-w-[200px]"
+                      className="p-2 border rounded mb-4 rounded-lg max-w-full md:max-w-[200px]"
                   />
                 </div>
                 <div className='my-2 w-full'>
                     <div className='flex gap-[2px]'>
-                        <div
-                        className='bg-green-500 rounded h-4'
-                        style={{ width: `${completedPercentage}%` }}
-                        ></div>
-                        <div
-                        className='bg-purple-500 rounded h-4'
-                        style={{ width: `${ongoingPercentage}%` }}
-                        ></div>
-                        <div
-                        className='bg-stone-400 rounded h-4'
-                        style={{ width: `${pendingPercentage}%` }}
-                        ></div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                          <div
+                          className='bg-green-500 rounded h-4'
+                          style={{ width: `${completedPercentage}%` }}
+                          ></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Completed {completedPercentage}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                          <div
+                          className='bg-purple-500 rounded h-4'
+                          style={{ width: `${ongoingPercentage}%` }}
+                          ></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ongoing {ongoingPercentage}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                          <div
+                          className='bg-stone-500 rounded h-4'
+                          style={{ width: `${pendingPercentage}%` }}
+                          ></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Pending {pendingPercentage}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                     <div className='flex gap-x-2 my-2'>
                         <div className='flex items-center gap-1'>
@@ -278,6 +363,46 @@ const Tasks = () => {
                         </div>
                     </div>
                 </div>
+                <div className='my-2 w-full'>
+                    <div className='flex gap-[2px]'>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                          <div
+                          className='bg-yellow-500 rounded h-4'
+                          style={{ width: `${ivanPelaporPercentage}%` }}
+                          ></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ivan {ivanPelaporPercentage}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                          <div
+                          className='bg-indigo-500 rounded h-4'
+                          style={{ width: `${drajatPelaporPercentage}%` }}
+                          ></div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Drajat {drajatPelaporPercentage}%</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <div className='flex gap-x-2 my-2'>
+                        <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
+                        <p className='text-xs font-light opacity-100'>Ivan</p>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
+                        <p className='text-xs font-light opacity-100'>Drajat</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <Table className='rounded-lg border'>
                 <TableCaption>A list of {project ? project.name : '...'} design tasks.</TableCaption>
@@ -285,6 +410,8 @@ const Tasks = () => {
                 <TableRow className='bg-stone-100 dark:bg-stone-800'>
                     <TableHead className="text-center w-[50px]">*</TableHead>
                     <TableHead className="w-full">Project</TableHead>
+                    <TableHead className="text-center w-[200px]">Pelapor</TableHead>
+                    <TableHead className="text-center w-[200px]">Status</TableHead>
                     <TableHead className="text-center w-[200px]">Aksi</TableHead>
                 </TableRow>
                 </TableHeader>
@@ -300,23 +427,46 @@ const Tasks = () => {
                             </div>
                         </TableCell>
                         <TableCell className="font-medium ">
-                            <div className='flex flex-row gap-3 items-center'>
-                                <div>
-                                {task.image && (
-                                    <ModalImage
-                                        small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                        large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                        // alt={task.name}
-                                        className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
-                                    />
-                                )}
+                            <div className='flex flex-col'>
+                              <div className='flex gap-3 items-center'>
+                                  <div>
+                                  {task.image && (
+                                      <ModalImage
+                                          small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                          large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                          // alt={task.name}
+                                          className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
+                                      />
+                                  )}
+                                  </div>
+                                  <p className='line-clamp-[2] w-[90%] font-medium opacity-70 my-2'>{task.name}</p>
                                 </div>
-                                <p className='line-clamp-[2] w-[90%] font-medium opacity-70 my-2'>{task.name}</p>
+                                <p className='font-light text-xs opacity-70 flex items-center gap-1 mt-1'> 
+                                  <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Clock className='w-4 h-4 opacity-80' />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Tanggal dibuat</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                   {formatDate(task.created_at)}</p>
                             </div>
                         </TableCell>
-                        <TableCell className="space-x-2 flex text-right w-full py-6">
-                            <Button size='icon' variant='ghost' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
-                            <select
+                        <TableCell>
+                          <select
+                                value={task.pelapor}
+                                onChange={(e) => handlePelaporChange(task.id, e.target.value)}
+                                className="p-2 border rounded dark:bg-black"
+                            >
+                                <option value="ivan">Ivan</option>
+                                <option value="drajat">Drajat</option>
+                            </select>
+                        </TableCell>
+                        <TableCell>
+                          <select
                                 value={task.status}
                                 onChange={(e) => handleStatusChange(task.id, e.target.value)}
                                 className="p-2 border rounded dark:bg-black"
@@ -325,9 +475,12 @@ const Tasks = () => {
                                 <option value="completed">Completed</option>
                                 <option value="ongoing">On Going</option>
                             </select>
+                        </TableCell>
+                        <TableCell className="space-x-2 flex text-right w-full py-6">
+                            <Button size='icon' variant='outline' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
                             <Sheet>
                                 <SheetTrigger asChild>
-                                    <Button variant="outline">Detail</Button>
+                                    <Button variant="outline"> Detail <ArrowUpRight className='w-4 h-4 ml-1' /></Button>
                                 </SheetTrigger>
                                 <SheetContent>
                                     <div className="grid gap-4 py-4 h-[86vh] overflow-y-scroll">
