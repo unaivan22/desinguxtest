@@ -12,7 +12,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUpRight, Clock, Loader, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Clock, Loader, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ModalImage from 'react-modal-image';
 import {
@@ -40,6 +40,15 @@ import {
     TooltipProvider,
     TooltipTrigger,
   } from "@/components/ui/tooltip"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationEllipsis,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Tasks = () => {
     const { projectId } = useParams();
@@ -65,9 +74,11 @@ const Tasks = () => {
       });
   
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1); // Pagination state
+    const itemsPerPage = 10; // Number of items per page
 
 
-    const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
+    const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -216,7 +227,89 @@ const Tasks = () => {
 
   const filteredTasks = tasks.filter(task =>
     task.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+  const paginatedTasks = filteredTasks.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page) => {
+      if (page >= 1 && page <= totalPages) {
+          setCurrentPage(page);
+      }
+  };
+
+  const renderPagination = () => {
+          const pages = [];
+          if (totalPages <= 3) {
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    // href="#"
+                    onClick={() => handlePageChange(i)}
+                    isActive={i === currentPage}
+                  >
+                    {i}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            }
+          } else {
+            const rangeStart = Math.max(2, currentPage - 1);
+            const rangeEnd = Math.min(totalPages - 1, currentPage + 1);
+      
+            pages.push(
+              <PaginationItem key={1}>
+                <PaginationLink
+                  // href="#"
+                  onClick={() => handlePageChange(1)}
+                  isActive={currentPage === 1}
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+            );
+      
+            if (rangeStart > 2) {
+              pages.push(<PaginationEllipsis key="start-ellipsis" />);
+            }
+      
+            for (let i = rangeStart; i <= rangeEnd; i++) {
+              pages.push(
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    // href="#"
+                    onClick={() => handlePageChange(i)}
+                    isActive={i === currentPage}
+                  >
+                    {i}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            }
+      
+            if (rangeEnd < totalPages - 1) {
+              pages.push(<PaginationEllipsis key="end-ellipsis" />);
+            }
+      
+            pages.push(
+              <PaginationItem key={totalPages}>
+                <PaginationLink
+                  // href="#"
+                  onClick={() => handlePageChange(totalPages)}
+                  isActive={currentPage === totalPages}
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          }
+          return pages;
+        };
 
     useEffect(() => {
         // Count tasks based on status
@@ -275,23 +368,29 @@ const Tasks = () => {
         <div className="container min-h-screen py-12">
             <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
             <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4">
-                <Input
-                    className="p-2 border rounded-lg"
-                    type="text"
-                    placeholder="Nama task"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                    disabled={loading}
-                />
-                <div className='flex flex-col md:flex-row gap-2'>
+                <div className='flex flex-col w-full'>
+                  <p className='text-sm mb-1 '>Nama Task</p>
                   <Input
-                      className="p-2 border rounded-lg w-full md:w-[250px]"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                      className="p-2 border rounded-lg"
+                      type="text"
+                      placeholder="Nama task"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      required
                       disabled={loading}
                   />
+                </div>
+                <div className='flex flex-col md:flex-row gap-2 md:items-end'>
+                  <div className='flex flex-col w-full'>
+                    <p className='text-sm mb-1 '>Upload Gambar <span className='opacity-50'>*opsional</span></p>
+                    <Input
+                        className="p-2 border rounded-lg w-full md:w-[250px]"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                        disabled={loading}
+                    />
+                  </div>
                   <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
                 </div>
             </form>
@@ -306,13 +405,13 @@ const Tasks = () => {
                       className="p-2 border rounded mb-4 rounded-lg max-w-full md:max-w-[200px]"
                   />
                 </div>
-                <div className='my-2 w-full'>
+                <div className='my-2 w-full w-full md:w-[80%]'>
                     <div className='flex gap-[2px]'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                           <div
-                          className='bg-green-500 rounded h-4'
+                          className='bg-green-500 rounded h-4 transition ease-in-out delay-150 duration-300'
                           style={{ width: `${completedPercentage}%` }}
                           ></div>
                           </TooltipTrigger>
@@ -325,7 +424,7 @@ const Tasks = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                           <div
-                          className='bg-purple-500 rounded h-4'
+                          className='bg-purple-500 rounded h-4 transition ease-in-out delay-150 duration-300'
                           style={{ width: `${ongoingPercentage}%` }}
                           ></div>
                           </TooltipTrigger>
@@ -338,7 +437,7 @@ const Tasks = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                           <div
-                          className='bg-stone-500 rounded h-4'
+                          className='bg-stone-500 rounded h-4 transition ease-in-out delay-150 duration-300'
                           style={{ width: `${pendingPercentage}%` }}
                           ></div>
                           </TooltipTrigger>
@@ -363,13 +462,13 @@ const Tasks = () => {
                         </div>
                     </div>
                 </div>
-                <div className='my-2 w-full'>
+                <div className='my-2 w-full md:w-[40%]'>
                     <div className='flex gap-[2px]'>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                           <div
-                          className='bg-yellow-500 rounded h-4'
+                          className='bg-yellow-500 rounded h-4 transition ease-in-out delay-150 duration-300'
                           style={{ width: `${ivanPelaporPercentage}%` }}
                           ></div>
                           </TooltipTrigger>
@@ -382,7 +481,7 @@ const Tasks = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                           <div
-                          className='bg-indigo-500 rounded h-4'
+                          className='bg-indigo-500 rounded h-4 transition ease-in-out delay-150 duration-300'
                           style={{ width: `${drajatPelaporPercentage}%` }}
                           ></div>
                           </TooltipTrigger>
@@ -404,8 +503,8 @@ const Tasks = () => {
                     </div>
                 </div>
             </div>
-            <Table className='rounded-lg border'>
-                <TableCaption>A list of {project ? project.name : '...'} design tasks.</TableCaption>
+            <Table className='rounded-lg border mb-4'>
+                {/* <TableCaption>A list of {project ? project.name : '...'} design tasks.</TableCaption> */}
                 <TableHeader>
                 <TableRow className='bg-stone-100 dark:bg-stone-800'>
                     <TableHead className="text-center w-[50px]">*</TableHead>
@@ -416,7 +515,7 @@ const Tasks = () => {
                 </TableRow>
                 </TableHeader>
                 <TableBody>
-                {filteredTasks.map((task) => (
+                {paginatedTasks.map((task) => (
                     <TableRow key={task.id}>
                         <TableCell>
                             <div
@@ -432,8 +531,8 @@ const Tasks = () => {
                                 <div>
                                 {task.image && (
                                     <ModalImage
-                                        small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                        large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                        small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                        large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
                                         // alt={task.name}
                                         className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
                                     />
@@ -486,17 +585,17 @@ const Tasks = () => {
                                     <Button variant="outline"> Detail <ArrowUpRight className='w-4 h-4 ml-1' /></Button>
                                 </SheetTrigger>
                                 <SheetContent>
-                                    <div className="grid gap-4 py-4 h-[86vh] overflow-y-scroll">
-                                        <div className='flex flex-col gap-1'>
+                                    <div className="grid gap-4 py-4 h-[96vh] md:h-[94vh] overflow-y-scroll">
+                                        <div className='flex flex-col gap-1 md:pr-4'>
                                             {task.image && (
                                                 <ModalImage
                                                     small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
                                                     large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
                                                     // alt={task.name}
-                                                    className="my-2 w-auto h-[128px] object-cover rounded-lg"
+                                                    className="my-2 w-auto h-full object-cover rounded-lg"
                                                 />
                                             )}
-                                            <p className='text-sm'>{task.name}</p>
+                                            <p className='text-sm mt-4'>{task.name}</p>
                                         </div>
                                     </div>
                                     {/* <SheetFooter className='py-4'>
@@ -512,6 +611,60 @@ const Tasks = () => {
                 ))}
                 </TableBody>
             </Table>
+
+            <p className='text-sm font-light opacity-70 text-center mb-4'>A list of {project ? project.name : '...'} design tasks.</p>
+
+            {/* Pagination */}
+            <Pagination>
+              <PaginationContent>
+                  <PaginationItem>
+                  <Button
+                      variant='outline'
+                      onClick={() => handlePageChange(1)}
+                      disabled={currentPage === 1}
+                  >
+                      First
+                  </Button>
+                  </PaginationItem>
+                  <PaginationItem>
+                  <Button
+                      variant='outline'
+                      size='icon'
+                      onClick={() =>
+                      handlePageChange(currentPage > 1 ? currentPage - 1 : 1)
+                      }
+                      disabled={currentPage === 1}
+                  >
+                      <ChevronLeft />
+                  </Button>
+                  </PaginationItem>
+                  {renderPagination()}
+                  <PaginationItem>
+                  <Button
+                      variant='outline'
+                      size='icon'
+                      onClick={() =>
+                      handlePageChange(
+                          currentPage < totalPages ? currentPage + 1 : totalPages
+                      )
+                      }
+                      disabled={currentPage === totalPages}
+                  >
+                      <ChevronRight />
+                  </Button>
+                  </PaginationItem>
+                  <PaginationItem>
+                  <Button
+                      variant='outline'
+                      onClick={() => handlePageChange(totalPages)}
+                      disabled={currentPage === totalPages}
+                  >
+                      Last
+                  </Button>
+                  </PaginationItem>
+              </PaginationContent>
+          </Pagination>
+          
 
             {editTask && (
         <Dialog open={!!editTask} onOpenChange={(open) => !open && setEditTask(null)}>
