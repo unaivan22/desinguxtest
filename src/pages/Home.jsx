@@ -188,9 +188,9 @@ const Home = () => {
                         placeholder="Cari projects..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="p-2 border rounded rounded-lg max-w-full md:max-w-[200px] order-2"
+                        className="p-2 border rounded rounded-lg max-w-full md:max-w-[200px] order-2 md:order-1"
                     />
-                    <form onSubmit={handleSubmit} className="flex gap-3 w-full items-center order-1">
+                    <form onSubmit={handleSubmit} className="flex gap-3 w-full items-center order-1 md:order-2">
                         <PlusCircleIcon className='w-6 h-6 opacity-60'/>
                         <Input
                             className="p-2 border rounded-lg"
