@@ -14,14 +14,19 @@ $input = json_decode(file_get_contents("php://input"), true);
 
 switch ($method) {
     case 'GET':
-        if (isset($_GET['project_id'])) {
-            $project_id = $_GET['project_id'];
-            $result = $conn->query("SELECT * FROM tasks WHERE project_id=$project_id");
-        } else {
-            $result = $conn->query("SELECT * FROM projects");
-        }
-        echo json_encode($result->fetch_all(MYSQLI_ASSOC));
-        break;
+    if (isset($_GET['project_id'])) {
+        $project_id = $_GET['project_id'];
+        $result = $conn->query("SELECT * FROM tasks WHERE project_id=$project_id");
+    } else {
+        // Get projects and count of pending and ongoing tasks
+        $result = $conn->query("SELECT p.id, p.name,
+                                       (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.status = 'pending') AS pending_count,
+                                       (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.status = 'ongoing') AS ongoing_count
+                                FROM projects p");
+    }
+    echo json_encode($result->fetch_all(MYSQLI_ASSOC));
+    break;
+
 
     case 'POST':
         // Handle file uploads for tasks

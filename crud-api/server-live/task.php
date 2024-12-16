@@ -75,6 +75,7 @@ switch ($method) {
         $id = $input['id'];
         $status = isset($input['status']) ? $input['status'] : null;
         $pelapor = isset($input['pelapor']) ? $input['pelapor'] : null;
+        $name = isset($input['name']) ? $input['name'] : null;
 
         $updates = [];
         $params = [];
@@ -106,10 +107,17 @@ switch ($method) {
             }
         }
 
+        // If name is provided, add it to the update statement
+        if ($name !== null) {
+            $updates[] = "name=?";
+            $params[] = $name;
+            $types .= 's'; // 's' for string (name field)
+        }
+
         // Ensure at least one field is being updated
         if (!empty($updates)) {
-            $params[] = $id;
-            $types .= 'i';
+            $params[] = $id; // Add the id to the parameters
+            $types .= 'i'; // 'i' for integer (id field)
             $stmt = $conn->prepare("UPDATE tasks SET " . implode(", ", $updates) . " WHERE id=?");
             $stmt->bind_param($types, ...$params);
             $stmt->execute();
@@ -129,6 +137,7 @@ switch ($method) {
         echo json_encode(["error" => "Missing id"]);
     }
     break;
+
 
     case 'DELETE':
     $id = $input['id'];
