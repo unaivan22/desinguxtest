@@ -81,28 +81,26 @@ const Tasks = () => {
     const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [projectRes, tasksRes] = await Promise.all([
-                    axios.get(`${apiUrl}?id=${projectId}`),
-                    axios.get(`${apiUrl}?project_id=${projectId}`)
-                ]);
-    
-                // If project data exists, set it
-                if (projectRes.data.length > 0) {
-                    setProject(projectRes.data[0]); // Assuming the first item is the latest project
-                }
-    
-                // Sort tasks to have the newest on top (assuming there's a 'created_at' field)
-                const sortedTasks = tasksRes.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                setTasks(sortedTasks);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-    
-        fetchData();
-    }, [projectId]);
+      const fetchData = async () => {
+          try {
+              // Fetch project details
+              const projectRes = await axios.get(`${apiUrl}?project_id=${projectId}&fetch_project=true`);
+              if (projectRes.data.length > 0) {
+                  setProject(projectRes.data[0]); // Set the project name and other details
+              }
+
+              // Fetch tasks
+              const tasksRes = await axios.get(`${apiUrl}?project_id=${projectId}`);
+              const sortedTasks = tasksRes.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              setTasks(sortedTasks);
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
+
+      fetchData();
+  }, [projectId]);
+  
     
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -589,8 +587,8 @@ const Tasks = () => {
                                         <div className='flex flex-col gap-1 md:pr-4'>
                                             {task.image && (
                                                 <ModalImage
-                                                    small={`${apiUrl.replace('/index.php', '')}/${task.image}`}
-                                                    large={`${apiUrl.replace('/index.php', '')}/${task.image}`}
+                                                  small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                                  large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
                                                     // alt={task.name}
                                                     className="my-2 w-auto h-full object-cover rounded-lg"
                                                 />

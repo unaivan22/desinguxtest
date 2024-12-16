@@ -15,12 +15,22 @@ $input = json_decode(file_get_contents("php://input"), true);
 switch ($method) {
     case 'GET':
         if (isset($_GET['project_id'])) {
-            $project_id = $_GET['project_id'];
-            $result = $conn->query("SELECT * FROM tasks WHERE project_id=$project_id");
+            $project_id = intval($_GET['project_id']);
+
+            // Fetch project details
+            if (isset($_GET['fetch_project'])) {
+                $result = $conn->query("SELECT * FROM projects WHERE id=$project_id");
+            } 
+            // Fetch tasks for the project
+            else {
+                $result = $conn->query("SELECT * FROM tasks WHERE project_id=$project_id");
+            }
+
+            echo json_encode($result->fetch_all(MYSQLI_ASSOC));
         } else {
             $result = $conn->query("SELECT * FROM projects");
+            echo json_encode($result->fetch_all(MYSQLI_ASSOC));
         }
-        echo json_encode($result->fetch_all(MYSQLI_ASSOC));
         break;
 
     case 'POST':
