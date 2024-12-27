@@ -12,7 +12,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Clock, Loader, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Clock, Loader, Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ModalImage from 'react-modal-image';
 import {
@@ -49,6 +49,10 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import "quill/dist/quill.core.css";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import parse from 'html-react-parser';
 
 const TasksMobile = () => {
     const { projectId } = useParams();
@@ -77,7 +81,8 @@ const TasksMobile = () => {
     const itemsPerPage = 10; // Number of items per page
 
 
-    const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
+    const apiUrl = '/crud-api/tasks.php';
+    // const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
 
     useEffect(() => {
       const fetchData = async () => {
@@ -353,14 +358,44 @@ const TasksMobile = () => {
         return `${day} ${month} ${year} (${time})`;
     };
 
+    const HtmlRenderer = ({ html }) => {
+          // Ensure `html` is a string
+      const safeHtml = typeof html === 'string' ? html : '';
+    
+      const parsedHtml = parse(safeHtml, {
+        replace: (domNode) => {
+          if (domNode.type === 'text') {
+            // Remove leading and trailing whitespaces
+            return domNode.data.trim();
+          }
+        },
+      });
+    
+      return <>{parsedHtml}</>;
+    };
+    
+
+    const fullToolbarOptions = [
+      [{ 'header': '1'}, { 'header': '2'}],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      // [{ 'script': 'sub'}, { 'script': 'super' }],
+      // [{ 'indent': '-1'}, { 'indent': '+1' }],
+      // [{ 'direction': 'rtl' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      ['clean']
+    ];
+
 
     return (
         <div className="container min-h-screen py-12">
             <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
             <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4 gap-2">
-                <div className='flex flex-col w-full'>
+                <div className='flex flex-col w-full h-[330px]'>
                   <p className='text-sm mb-1 '>Nama Task</p>
-                  <Input
+                  {/* <Input
                       className="p-2 border rounded-lg"
                       type="text"
                       placeholder="Nama task"
@@ -368,6 +403,15 @@ const TasksMobile = () => {
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       required
                       disabled={loading}
+                  /> */}
+                  <ReactQuill
+                    theme="snow"
+                    value={form.name}
+                    onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
+                    modules={{ toolbar: fullToolbarOptions }}
+                    className="quill-editor w-full h-[220px] rounded"
+                    required
+                    disabled={loading}
                   />
                 </div>
                 <div className='flex flex-col md:flex-row gap-2 md:items-end'>
@@ -518,7 +562,7 @@ const TasksMobile = () => {
                                     )}
                                     </div>
                                     <div className='flex flex-col gap-2 w-[330px]'>
-                                        <p className='line-clamp-[1] font-medium opacity-70'>{task.name}</p>
+                                        <p className='line-clamp-[1] font-medium opacity-70'><HtmlRenderer html={task.name} /></p>
                                         <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
                                         <TooltipProvider>
                                             <Tooltip>
@@ -559,8 +603,11 @@ const TasksMobile = () => {
                         </div>
                     </SheetTrigger>
                     <SheetContent>
+                        <SheetHeader>
+                          <SheetTitle className='pb-3'><Button variant='secondary' onClick={() => handleEdit(task)}> <Pencil /> Edit Task</Button></SheetTitle>
+                        </SheetHeader>
                         <div className="grid gap-4 py-4 h-[96vh] md:h-[88vh] overflow-y-scroll">
-                            <div className='flex flex-col gap-1 md:pr-4'>
+                            <div className='flex flex-col gap-1 md:pr-4 task-detail'>
                                 {task.image && (
                                     <ModalImage
                                     small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
@@ -569,15 +616,15 @@ const TasksMobile = () => {
                                         className="my-2 w-auto h-full object-cover rounded-lg"
                                     />
                                 )}
-                                <p className='text-sm mt-4'>{task.name}</p>
+                                <p className='text-sm mt-4 mb-4'><HtmlRenderer html={task.name} /></p>
                             </div>
                         </div>
-                        <SheetFooter className='py-4'>
+                        {/* <SheetFooter className='py-4'>
                             <SheetClose asChild>
                                 
                             <Button onClick={() => handleEdit(task)}>Edit Task</Button>
                             </SheetClose>
-                        </SheetFooter>
+                        </SheetFooter> */}
                     </SheetContent>
                 </Sheet>
             ))}
@@ -646,16 +693,24 @@ const TasksMobile = () => {
             <DialogHeader>
               {/* <DialogTitle>Edit Task</DialogTitle> */}
               <DialogDescription>
-                Make changes to your task here. Click save when you're done.
+                Lakukan perubahan pada tugas Anda di sini. Klik simpan setelah selesai.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <Input
+            <div className="grid gap-4 py-4 h-[400px]">
+              {/* <Input
                 label="Task Name"
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
                 placeholder="Task name"
                 required
+              /> */}
+              <ReactQuill
+                theme="snow"
+                value={editedName} // Bind the current value
+                onChange={(value) => setEditedName(value)} // Update state directly with the new value
+                placeholder="Task name"
+                modules={{ toolbar: fullToolbarOptions }}
+                className="quill-editor h-[300px]"
               />
             </div>
             <DialogFooter>

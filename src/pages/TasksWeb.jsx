@@ -12,7 +12,7 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Clock, Loader, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Clock, Loader, Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ModalImage from 'react-modal-image';
 import {
@@ -49,6 +49,11 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Textarea } from '@/components/ui/textarea';
+import "quill/dist/quill.core.css";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import parse from 'html-react-parser';
 
 const TasksWeb = () => {
     const { projectId } = useParams();
@@ -77,6 +82,7 @@ const TasksWeb = () => {
     const itemsPerPage = 10; // Number of items per page
 
 
+    // const apiUrl = '/crud-api/tasks.php';
     const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
 
     useEffect(() => {
@@ -353,336 +359,414 @@ const TasksWeb = () => {
         return `${day} ${month} ${year} (${time})`;
     };
 
+    const HtmlRenderer = ({ html }) => {
+      // Ensure `html` is a string
+      const safeHtml = typeof html === 'string' ? html : '';
+    
+      const parsedHtml = parse(safeHtml, {
+        replace: (domNode) => {
+          if (domNode.type === 'text') {
+            // Remove leading and trailing whitespaces
+            return domNode.data.trim();
+          }
+        },
+      });
+    
+      return <>{parsedHtml}</>;
+    };
+    
+
+    const fullToolbarOptions = [
+      [{ 'header': '1'}, { 'header': '2'}],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      // [{ 'script': 'sub'}, { 'script': 'super' }],
+      // [{ 'indent': '-1'}, { 'indent': '+1' }],
+      // [{ 'direction': 'rtl' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'align': [] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      ['clean']
+    ];
 
     return (
-        <div className="container min-h-screen py-12">
-            <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
-            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4">
-                <div className='flex flex-col w-full'>
-                  <p className='text-sm mb-1 '>Nama Task</p>
-                  <Input
-                      className="p-2 border rounded-lg"
-                      type="text"
-                      placeholder="Nama task"
+        <div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to='/' className='fixed top-12 left-12'><Button variant='outline' size='icon'> <ArrowLeft /></Button></Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Daftar project</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="container min-h-screen py-12">
+              <h1 className="text-2xl font-bold my-4">Design Tasks {project ? project.name : '...'}</h1>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6 pt-4 pb-8 mb-8 border-b items-start">
+                  <div className='flex w-full items-start min-h-[260px]'>
+                    <p className='text-sm mb-1 w-[300px]'>Nama Task</p>
+                    {/* <Textarea
+                        className="p-2 border rounded-lg"
+                        type="text"
+                        placeholder="Detail task"
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        required
+                        disabled={loading}
+                    /> */}
+                    <ReactQuill
+                      theme="snow"
                       value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
+                      modules={{ toolbar: fullToolbarOptions }}
+                      className="quill-editor w-full h-[220px] rounded"
                       required
                       disabled={loading}
-                  />
-                </div>
-                <div className='flex flex-col md:flex-row gap-2 md:items-end'>
-                  <div className='flex flex-col w-full'>
-                    <p className='text-sm mb-1 '>Upload Gambar <span className='opacity-50'>*opsional</span></p>
-                    <Input
-                        className="p-2 border rounded-lg w-full md:w-[250px]"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-                        disabled={loading}
                     />
                   </div>
-                  <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
-                </div>
-            </form>
-            <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
-                <div className='flex gap-x-2 w-full'>
-                  <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link>
-                  <Input
-                      type="search"
-                      placeholder="Cari tasks..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="p-2 border rounded mb-4 rounded-lg max-w-full md:max-w-[200px]"
-                  />
-                </div>
-                <div className='my-2 w-full w-full md:w-[80%]'>
-                    <div className='flex gap-[2px]'>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <div
-                          className='bg-green-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                          style={{ width: `${completedPercentage}%` }}
-                          ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Completed {completedPercentage}%</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <div
-                          className='bg-purple-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                          style={{ width: `${ongoingPercentage}%` }}
-                          ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Ongoing {ongoingPercentage}%</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <div
-                          className='bg-stone-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                          style={{ width: `${pendingPercentage}%` }}
-                          ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Pending {pendingPercentage}%</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className='flex gap-x-2 my-2'>
-                        <div className='flex items-center gap-1'>
-                        <div className='h-2 w-2 rounded-full bg-green-500'></div>
-                        <p className='text-xs font-light opacity-100'>Complete</p>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                        <div className='h-2 w-2 rounded-full bg-purple-500'></div>
-                        <p className='text-xs font-light opacity-100'>On Going</p>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                        <div className='h-2 w-2 rounded-full bg-stone-300'></div>
-                        <p className='text-xs font-light opacity-400'>Pending</p>
-                        </div>
-                    </div>
-                </div>
-                <div className='my-2 w-full md:w-[40%]'>
-                    <div className='flex gap-[2px]'>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <div
-                          className='bg-yellow-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                          style={{ width: `${ivanPelaporPercentage}%` }}
-                          ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Ivan {ivanPelaporPercentage}%</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                          <div
-                          className='bg-indigo-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                          style={{ width: `${drajatPelaporPercentage}%` }}
-                          ></div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Drajat {drajatPelaporPercentage}%</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                    <div className='flex gap-x-2 my-2'>
-                        <div className='flex items-center gap-1'>
-                        <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
-                        <p className='text-xs font-light opacity-100'>Ivan</p>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                        <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
-                        <p className='text-xs font-light opacity-100'>Drajat</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <Table className='rounded-lg border mb-4'>
-                {/* <TableCaption>A list of {project ? project.name : '...'} design tasks.</TableCaption> */}
-                <TableHeader>
-                <TableRow className='bg-stone-100 dark:bg-stone-800'>
-                    <TableHead className="text-center w-[50px]">*</TableHead>
-                    <TableHead className="w-full">Project</TableHead>
-                    <TableHead className="text-center w-[200px]">Pelapor</TableHead>
-                    <TableHead className="text-center w-[200px]">Status</TableHead>
-                    <TableHead className="text-center w-[200px]">Aksi</TableHead>
-                </TableRow>
-                </TableHeader>
-                <TableBody>
-                {paginatedTasks.map((task) => (
-                    <TableRow key={task.id}>
-                        <TableCell>
+                  <div className='flex w-full items-center'>
+                      <p className='text-sm mb-1 w-[300px]'>Upload Gambar <span className='opacity-50'>*opsional</span></p>
+                      <Input
+                          className="p-2 border rounded-lg w-full"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                          disabled={loading}
+                      />
+                  </div>
+                  <div className='flex w-full items-center'>
+                      <p className='text-sm mb-1 w-[300px] invisible'>Aksi</p>
+                      <div className='w-full'>
+                        <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
+                      </div>
+                  </div>
+              </form>
+              <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
+                  <div className='flex gap-x-2 w-full'>
+                    {/* <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link> */}
+                    <Input
+                        type="search"
+                        placeholder="Cari tasks..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="p-2 border rounded mb-4 rounded-lg max-w-full md:max-w-[300px]"
+                    />
+                  </div>
+                  <div className='my-2 w-full w-full md:w-[80%]'>
+                      <div className='flex gap-[2px]'>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                             <div
-                                className={`w-3 h-3 rounded-full ${
-                                    task.status === 'completed' ? 'bg-green-500' :
-                                    task.status === 'ongoing' ? 'bg-purple-500' : 'bg-stone-400'
-                                }`}>
-                            </div>
-                        </TableCell>
-                        <TableCell className="font-medium ">
-                            <div className='flex flex-col'>
-                              <div className='flex gap-3 items-center'>
-                                <div>
-                                {task.image && (
-                                    <ModalImage
-                                        small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                        large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                        // alt={task.name}
-                                        className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
-                                    />
-                                )}
-                                </div>
-                                <div className='flex flex-col gap-2 w-[300px] md:w-[90%]'>
-                                  <p className='line-clamp-[1] font-medium opacity-70'>{task.name}</p>
-                                  <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <Clock className='w-4 h-4 opacity-80' />
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>Tanggal dibuat</p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </TooltipProvider>
-                                    {formatDate(task.created_at)}</p>
-                                </div>
+                            className='bg-green-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                            style={{ width: `${completedPercentage}%` }}
+                            ></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Completed {completedPercentage}%</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                            <div
+                            className='bg-purple-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                            style={{ width: `${ongoingPercentage}%` }}
+                            ></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Ongoing {ongoingPercentage}%</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                            <div
+                            className='bg-stone-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                            style={{ width: `${pendingPercentage}%` }}
+                            ></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Pending {pendingPercentage}%</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <div className='flex gap-x-2 my-2'>
+                          <div className='flex items-center gap-1'>
+                          <div className='h-2 w-2 rounded-full bg-green-500'></div>
+                          <p className='text-xs font-light opacity-100'>Complete</p>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                          <div className='h-2 w-2 rounded-full bg-purple-500'></div>
+                          <p className='text-xs font-light opacity-100'>On Going</p>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                          <div className='h-2 w-2 rounded-full bg-stone-300'></div>
+                          <p className='text-xs font-light opacity-400'>Pending</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div className='my-2 w-full md:w-[40%]'>
+                      <div className='flex gap-[2px]'>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                            <div
+                            className='bg-yellow-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                            style={{ width: `${ivanPelaporPercentage}%` }}
+                            ></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Ivan {ivanPelaporPercentage}%</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                            <div
+                            className='bg-indigo-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                            style={{ width: `${drajatPelaporPercentage}%` }}
+                            ></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Drajat {drajatPelaporPercentage}%</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <div className='flex gap-x-2 my-2'>
+                          <div className='flex items-center gap-1'>
+                          <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
+                          <p className='text-xs font-light opacity-100'>Ivan</p>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                          <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
+                          <p className='text-xs font-light opacity-100'>Drajat</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <Table className='rounded-lg border mb-4'>
+                  {/* <TableCaption>A list of {project ? project.name : '...'} design tasks.</TableCaption> */}
+                  <TableHeader>
+                  <TableRow className='bg-stone-100 dark:bg-stone-800'>
+                      <TableHead className="text-center w-[50px]">*</TableHead>
+                      <TableHead className="w-full">Project</TableHead>
+                      <TableHead className="text-center w-[200px]">Pelapor</TableHead>
+                      <TableHead className="text-center w-[200px]">Status</TableHead>
+                      <TableHead className="text-center w-[200px]">Aksi</TableHead>
+                  </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                  {paginatedTasks.map((task) => (
+                      <TableRow key={task.id}>
+                          <TableCell>
+                              <div
+                                  className={`w-3 h-3 rounded-full ${
+                                      task.status === 'completed' ? 'bg-green-500' :
+                                      task.status === 'ongoing' ? 'bg-purple-500' : 'bg-stone-400'
+                                  }`}>
                               </div>
-                                
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                          <select
-                                value={task.pelapor}
-                                onChange={(e) => handlePelaporChange(task.id, e.target.value)}
-                                className="p-2 border rounded dark:bg-black"
-                            >
-                                <option value="ivan">Ivan</option>
-                                <option value="drajat">Drajat</option>
-                            </select>
-                        </TableCell>
-                        <TableCell>
-                          <select
-                                value={task.status}
-                                onChange={(e) => handleStatusChange(task.id, e.target.value)}
-                                className="p-2 border rounded dark:bg-black"
-                            >
-                                <option value="pending">Pending</option>
-                                <option value="completed">Completed</option>
-                                <option value="ongoing">On Going</option>
-                            </select>
-                        </TableCell>
-                        <TableCell className="space-x-2 flex text-right w-full py-6">
-                            <Button size='icon' variant='outline' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
-                            <Sheet>
-                                <SheetTrigger asChild>
-                                    <Button variant="outline"> Detail <ArrowUpRight className='w-4 h-4 ml-1' /></Button>
-                                </SheetTrigger>
-                                <SheetContent>
-                                    <div className="grid gap-4 py-4 h-[96vh] md:h-[88vh] overflow-y-scroll">
-                                        <div className='flex flex-col gap-1 md:pr-4'>
-                                            {task.image && (
-                                                <ModalImage
-                                                  small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                                  large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                                    // alt={task.name}
-                                                    className="my-2 w-auto h-full object-cover rounded-lg"
-                                                />
-                                            )}
-                                            <p className='text-sm mt-4'>{task.name}</p>
-                                        </div>
-                                    </div>
-                                    <SheetFooter className='py-4'>
-                                        <SheetClose asChild>
-                                            
-                                        <Button onClick={() => handleEdit(task)}>Edit Task</Button>
-                                        </SheetClose>
-                                    </SheetFooter>
-                                </SheetContent>
-                                </Sheet>
-                        </TableCell>
-                    </TableRow>
-                ))}
-                </TableBody>
-            </Table>
+                          </TableCell>
+                          <TableCell className="font-medium ">
+                              <div className='flex flex-col'>
+                                <div className='flex gap-3 items-center'>
+                                  <div>
+                                  {task.image && (
+                                      <ModalImage
+                                          small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                          large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                          // alt={task.name}
+                                          className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
+                                      />
+                                  )}
+                                  </div>
+                                  <div className='flex flex-col gap-2 w-[300px] md:w-[90%]'>
+                                    {/* <p className='line-clamp-[1] font-medium opacity-70'>{task.name}</p> */}
+                                    <p className='line-clamp-[1] font-medium opacity-70'><HtmlRenderer html={task.name} /></p>
+                                    <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
+                                      <TooltipProvider>
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <Clock className='w-4 h-4 opacity-80' />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <p>Tanggal dibuat</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                      {formatDate(task.created_at)}</p>
+                                  </div>
+                                </div>
+                                  
+                              </div>
+                          </TableCell>
+                          <TableCell>
+                            <select
+                                  value={task.pelapor}
+                                  onChange={(e) => handlePelaporChange(task.id, e.target.value)}
+                                  className="p-2 bg-transparent rounded dark:bg-black"
+                              >
+                                  <option value="ivan">Ivan</option>
+                                  <option value="drajat">Drajat</option>
+                              </select>
+                          </TableCell>
+                          <TableCell>
+                            <select
+                                  value={task.status}
+                                  onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                                  className="p-2 bg-transparent rounded dark:bg-black"
+                              >
+                                  <option value="pending">Pending</option>
+                                  <option value="completed">Completed</option>
+                                  <option value="ongoing">On Going</option>
+                              </select>
+                          </TableCell>
+                          <TableCell className="space-x-2 flex text-right w-full py-6">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button size='icon' variant='ghost' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Hapus Task</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <Sheet>
+                                  <SheetTrigger asChild>
+                                      <Button variant="outline"> Detail <ArrowUpRight className='w-4 h-4 ml-1' /></Button>
+                                  </SheetTrigger>
+                                  <SheetContent>
+                                      <SheetHeader>
+                                        <SheetTitle className='pb-3'><Button variant='secondary' onClick={() => handleEdit(task)}> <Pencil /> Edit Task</Button></SheetTitle>
+                                      </SheetHeader>
+                                      <div className="grid gap-4 h-[96vh] md:h-[88vh] overflow-y-scroll">
+                                          <div className='flex flex-col gap-1 md:pr-4 task-detail'>
+                                              {task.image && (
+                                                  <ModalImage
+                                                    small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                                    large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                                      // alt={task.name}
+                                                      className="my-2 w-auto h-full object-cover rounded-lg border"
+                                                  />
+                                              )}
+                                              {/* <p className='text-sm mt-4'>{task.task}</p> */}
 
-            <p className='text-sm font-light opacity-70 text-center mb-4'>A list of {project ? project.name : '...'} design tasks.</p>
+                                              <div className='mt-4 pb-12'>
+                                                <HtmlRenderer html={task.name} />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      {/* <SheetFooter className='py-4'>
+                                          <SheetClose asChild>
+                                              
+                                          <Button onClick={() => handleEdit(task)}>Edit Task</Button>
+                                          </SheetClose>
+                                      </SheetFooter> */}
+                                  </SheetContent>
+                                  </Sheet>
+                          </TableCell>
+                      </TableRow>
+                  ))}
+                  </TableBody>
+              </Table>
 
-            {/* Pagination */}
-            <Pagination>
-              <PaginationContent>
-                  <PaginationItem>
-                  <Button
-                      variant='outline'
-                      onClick={() => handlePageChange(1)}
-                      disabled={currentPage === 1}
-                  >
-                      First
-                  </Button>
-                  </PaginationItem>
-                  <PaginationItem>
-                  <Button
-                      variant='outline'
-                      size='icon'
-                      onClick={() =>
-                      handlePageChange(currentPage > 1 ? currentPage - 1 : 1)
-                      }
-                      disabled={currentPage === 1}
-                  >
-                      <ChevronLeft />
-                  </Button>
-                  </PaginationItem>
-                  {renderPagination()}
-                  <PaginationItem>
-                  <Button
-                      variant='outline'
-                      size='icon'
-                      onClick={() =>
-                      handlePageChange(
-                          currentPage < totalPages ? currentPage + 1 : totalPages
-                      )
-                      }
-                      disabled={currentPage === totalPages}
-                  >
-                      <ChevronRight />
-                  </Button>
-                  </PaginationItem>
-                  <PaginationItem>
-                  <Button
-                      variant='outline'
-                      onClick={() => handlePageChange(totalPages)}
-                      disabled={currentPage === totalPages}
-                  >
-                      Last
-                  </Button>
-                  </PaginationItem>
-              </PaginationContent>
-          </Pagination>
-          
+              <p className='text-sm font-light opacity-70 text-center mb-4'>A list of {project ? project.name : '...'} design tasks.</p>
 
-            {editTask && (
-        <Dialog open={!!editTask} onOpenChange={(open) => !open && setEditTask(null)}>
-          <DialogTrigger asChild>
-            <Button>Edit Task</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              {/* <DialogTitle>Edit Task</DialogTitle> */}
-              <DialogDescription>
-                Make changes to your task here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <Input
-                label="Task Name"
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                placeholder="Task name"
-                required
-              />
-            </div>
-            <DialogFooter>
-              <Button onClick={handleSaveChanges}>Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+              {/* Pagination */}
+              <Pagination>
+                <PaginationContent>
+                    <PaginationItem>
+                    <Button
+                        variant='outline'
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                    >
+                        First
+                    </Button>
+                    </PaginationItem>
+                    <PaginationItem>
+                    <Button
+                        variant='outline'
+                        size='icon'
+                        onClick={() =>
+                        handlePageChange(currentPage > 1 ? currentPage - 1 : 1)
+                        }
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft />
+                    </Button>
+                    </PaginationItem>
+                    {renderPagination()}
+                    <PaginationItem>
+                    <Button
+                        variant='outline'
+                        size='icon'
+                        onClick={() =>
+                        handlePageChange(
+                            currentPage < totalPages ? currentPage + 1 : totalPages
+                        )
+                        }
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight />
+                    </Button>
+                    </PaginationItem>
+                    <PaginationItem>
+                    <Button
+                        variant='outline'
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    >
+                        Last
+                    </Button>
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination>
+            
+
+              {editTask && (
+          <Dialog open={!!editTask} onOpenChange={(open) => !open && setEditTask(null)}>
+            <DialogTrigger asChild>
+              <Button>Edit Task</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                {/* <DialogTitle>Edit Task</DialogTitle> */}
+                <DialogDescription>
+                  Lakukan perubahan pada tugas Anda di sini. Klik simpan setelah selesai.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 pb-4 h-[380px]">
+                {/* <Textarea
+                  label="Task Name"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  placeholder="Task name"
+                  required
+                /> */}
+                <ReactQuill
+                  theme="snow"
+                  value={editedName} // Bind the current value
+                  onChange={(value) => setEditedName(value)} // Update state directly with the new value
+                  placeholder="Task name"
+                  modules={{ toolbar: fullToolbarOptions }}
+                  className="quill-editor h-[300px]"
+                />
+              </div>
+              <DialogFooter>
+                <Button onClick={handleSaveChanges}>Simpan</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+          </div>
         </div>
     );
 };

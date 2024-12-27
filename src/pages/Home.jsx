@@ -23,6 +23,12 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 
 const Home = () => {
     const [projects, setProjects] = useState([]);
@@ -34,7 +40,8 @@ const Home = () => {
     const itemsPerPage = 10; // Number of items per page
     const [tasksCount, setTasksCount] = useState({});
 
-    const apiUrl = 'http://designtest.energeek.id/crud-api/index.php';
+    // const apiUrl = '/crud-api/index.php';
+    const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
 
     useEffect(() => {
         axios.get(apiUrl).then((res) => setProjects(res.data));
@@ -63,7 +70,7 @@ const Home = () => {
     };
 
     const handleDelete = (id) => {
-        const isConfirmed = window.confirm("Yakin hapus design test project ini? data task project terkait juga akan ikut terhapus");
+        const isConfirmed = window.confirm("Yakin hapus design testing project ini? data task project terkait juga akan ikut terhapus");
         if (isConfirmed) {
             axios.delete(apiUrl, { data: { id } }).then(() => {
                 setProjects(projects.filter((project) => project.id !== id));
@@ -95,9 +102,9 @@ const Home = () => {
 
     // Pagination logic
     const totalPages = Math.ceil(filteredProjects.length / itemsPerPage);
-    const paginatedProjects = filteredProjects.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+    const paginatedProjects = filteredProjects
+        .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically A to Z
+        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage
     );
 
     const handlePageChange = (page) => {
@@ -179,7 +186,8 @@ const Home = () => {
         <section>
             <div className="container min-h-screen py-12">
                 <div className='flex items-center gap-x-2'>
-                    <h1 className="text-2xl font-bold">Design Test Energeek</h1> 
+                    <img src='/e.svg' className='w-8' />
+                    <h1 className="text-2xl font-bold">Energeek - Design Testing </h1> 
                     <ModeToggle />
                 </div>
                 <div className='flex flex-col md:flex-row items-center gap-4 md:gap-x-24 my-6 w-full'>
@@ -216,9 +224,18 @@ const Home = () => {
                             <TableRow key={project.id}>
                                 <TableCell className="font-medium">{project.name}</TableCell>
                                 <TableCell className="space-x-2 flex text-right w-full items-center">
-                                    <Button size='icon' variant='ghost' onClick={() => handleDelete(project.id)}>
-                                        <Trash2 className="h-4 w-4 text-rose-500" />
-                                    </Button>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button size='icon' variant='ghost' onClick={() => handleDelete(project.id)}>
+                                                    <Trash2 className="h-4 w-4 text-rose-500" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Hapus Project</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     <Button variant="outline" onClick={() => handleEdit(project)}>
                                         Edit
                                     </Button>
