@@ -75,6 +75,7 @@ switch ($method) {
         $id = $input['id'];
         $status = isset($input['status']) ? $input['status'] : null;
         $pelapor = isset($input['pelapor']) ? $input['pelapor'] : null;
+        $eksekutor = isset($input['eksekutor']) ? $input['eksekutor'] : null;
         $name = isset($input['name']) ? $input['name'] : null;
 
         $updates = [];
@@ -103,6 +104,19 @@ switch ($method) {
             } else {
                 http_response_code(400);
                 echo json_encode(["error" => "Invalid pelapor value"]);
+                break;
+            }
+        }
+
+        // Validate and prepare the eksekutor field
+        if ($eksekutor !== null) {
+            if (in_array($eksekutor, ['joko','hanif','ikke','aria','fatchur','rifan','evan','rico','fahmi','algiant','ardy','bakhrul','fenti'])) {
+                $updates[] = "eksekutor=?";
+                $params[] = $eksekutor;
+                $types .= 's';
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Invalid eksekutor value"]);
                 break;
             }
         }

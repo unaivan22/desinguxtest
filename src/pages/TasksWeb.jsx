@@ -77,6 +77,22 @@ const TasksWeb = () => {
         ivan: 0,
         drajat: 0,
       });
+
+    const [eksekutorCounts, setEksekutorCounts] = useState({
+        joko: 0,
+        hanif: 0,
+        ikke: 0,
+        aria: 0,
+        fatchur: 0,
+        rifan: 0,
+        evan: 0,
+        rico: 0,
+        fahmi: 0,
+        algiant: 0,
+        ardy: 0,
+        bakhrul: 0,
+        fenti: 0,
+      });
   
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1); // Pagination state
@@ -173,6 +189,22 @@ const TasksWeb = () => {
           alert("Failed to update pelapor. Please try again.");
       }
   };  
+
+  const handleEksekutorChange = async (id, eksekutor) => {
+    try {
+        await axios.put(apiUrl, { id, eksekutor });
+        
+        // Update the local tasks state
+        setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+                task.id === id ? { ...task, eksekutor } : task
+            )
+        );
+    } catch (error) {
+        console.error("Failed to update eksekutor:", error);
+        alert("Failed to update eksekutor. Please try again.");
+    }
+};  
 
     const handleDelete = (id) => {
         // Show a confirmation alert before proceeding with the delete action
@@ -347,6 +379,57 @@ const TasksWeb = () => {
       const totalPelaporTasks = tasks.length;
       const ivanPelaporPercentage = totalPelaporTasks ? (pelaporCounts.ivan / totalPelaporTasks) * 100 : 0;
       const drajatPelaporPercentage = totalPelaporTasks ? (pelaporCounts.drajat / totalPelaporTasks) * 100 : 0;
+
+      useEffect(() => {
+        // Count tasks based on status
+        const counts = { joko: 0, hanif: 0, ikke: 0, aria: 0, fatchur: 0, rifan: 0, evan: 0, rico: 0, fahmi: 0, algiant: 0, ardy: 0, bakhrul: 0, fenti: 0,};
+        tasks.forEach(task => {
+          if (task.eksekutor === 'joko') {
+            counts.joko += 1;
+          } else if (task.eksekutor === 'hanif') {
+            counts.hanif += 1;
+          } else if (task.eksekutor === 'ikke') {
+            counts.ikke += 1;
+          } else if (task.eksekutor === 'aria') {
+            counts.aria += 1;
+          } else if (task.eksekutor === 'fatchur') {
+            counts.fatchur += 1;
+          } else if (task.eksekutor === 'rifan') {
+            counts.rifan += 1;
+          } else if (task.eksekutor === 'evan') {
+            counts.evan += 1;
+          } else if (task.eksekutor === 'rico') {
+            counts.rico += 1;
+          } else if (task.eksekutor === 'fahmi') {
+            counts.fahmi += 1;
+          } else if (task.eksekutor === 'algiant') {
+            counts.algiant += 1;
+          } else if (task.eksekutor === 'ardy') {
+            counts.ardy += 1;
+          } else if (task.eksekutor === 'bakhrul') {
+            counts.bakhrul += 1;
+          } else if (task.eksekutor === 'fenti') {
+            counts.fenti += 1;
+          }
+        });
+        setEksekutorCounts(counts);
+      }, [tasks]);
+
+      // Calculate total number of tasks
+      const totalEksekutorTasks = tasks.length;
+      const jokoEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.joko / totalEksekutorTasks) * 100 : 0;
+      const hanifEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.hanif / totalEksekutorTasks) * 100 : 0;
+      const ikkeEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.ikke / totalEksekutorTasks) * 100 : 0;
+      const ariaEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.aria / totalEksekutorTasks) * 100 : 0;
+      const fatchurEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fatchur / totalEksekutorTasks) * 100 : 0;
+      const rifanEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.rifan / totalEksekutorTasks) * 100 : 0;
+      const evanEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.evan / totalEksekutorTasks) * 100 : 0;
+      const ricoEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.rico / totalEksekutorTasks) * 100 : 0;
+      const fahmiEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fahmi / totalEksekutorTasks) * 100 : 0;
+      const algiantEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.algiant / totalEksekutorTasks) * 100 : 0;
+      const ardyEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.ardy / totalEksekutorTasks) * 100 : 0;
+      const bakhrulEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.bakhrul / totalEksekutorTasks) * 100 : 0;
+      const fentiEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fenti / totalEksekutorTasks) * 100 : 0;
     
       const formatDate = (dateString) => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -445,7 +528,7 @@ const TasksWeb = () => {
                   </div>
               </form>
               <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
-                  <div className='flex gap-x-2 w-full'>
+                  <div className='flex gap-x-2 w-[80%]'>
                     {/* <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link> */}
                     <Input
                         type="search"
@@ -455,101 +538,332 @@ const TasksWeb = () => {
                         className="p-2 border rounded mb-4 rounded-lg max-w-full md:max-w-[300px]"
                     />
                   </div>
-                  <div className='my-2 w-full w-full md:w-[80%]'>
-                      <div className='flex gap-[2px]'>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                            <div
-                            className='bg-green-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                            style={{ width: `${completedPercentage}%` }}
-                            ></div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Completed {completedPercentage}%</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                            <div
-                            className='bg-purple-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                            style={{ width: `${ongoingPercentage}%` }}
-                            ></div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Ongoing {ongoingPercentage}%</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                            <div
-                            className='bg-stone-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                            style={{ width: `${pendingPercentage}%` }}
-                            ></div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Pending {pendingPercentage}%</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                  <div className='flex flex-col w-full'>
+                    <div className='flex gap-4'>
+                      <div className='my-2 w-full w-full'>
+                          <div className='flex gap-[2px]'>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                <div
+                                className='bg-green-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                                style={{ width: `${completedPercentage}%` }}
+                                ></div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Completed {completedPercentage}%</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                <div
+                                className='bg-purple-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                                style={{ width: `${ongoingPercentage}%` }}
+                                ></div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Ongoing {ongoingPercentage}%</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                <div
+                                className='bg-stone-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                                style={{ width: `${pendingPercentage}%` }}
+                                ></div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Pending {pendingPercentage}%</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                          <div className='flex gap-x-2 my-2'>
+                              <div className='flex items-center gap-1'>
+                              <div className='h-2 w-2 rounded-full bg-green-500'></div>
+                              <p className='text-xs font-light opacity-100'>Complete</p>
+                              </div>
+                              <div className='flex items-center gap-1'>
+                              <div className='h-2 w-2 rounded-full bg-purple-500'></div>
+                              <p className='text-xs font-light opacity-100'>On Going</p>
+                              </div>
+                              <div className='flex items-center gap-1'>
+                              <div className='h-2 w-2 rounded-full bg-stone-300'></div>
+                              <p className='text-xs font-light opacity-400'>Pending</p>
+                              </div>
+                          </div>
                       </div>
-                      <div className='flex gap-x-2 my-2'>
-                          <div className='flex items-center gap-1'>
-                          <div className='h-2 w-2 rounded-full bg-green-500'></div>
-                          <p className='text-xs font-light opacity-100'>Complete</p>
+                      <div className='my-2 w-full md:w-[40%]'>
+                          <div className='flex gap-[2px]'>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                <div
+                                className='bg-yellow-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                                style={{ width: `${ivanPelaporPercentage}%` }}
+                                ></div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Ivan {ivanPelaporPercentage}%</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                <div
+                                className='bg-indigo-500 rounded h-4 transition ease-in-out delay-150 duration-300'
+                                style={{ width: `${drajatPelaporPercentage}%` }}
+                                ></div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Drajat {drajatPelaporPercentage}%</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
-                          <div className='flex items-center gap-1'>
-                          <div className='h-2 w-2 rounded-full bg-purple-500'></div>
-                          <p className='text-xs font-light opacity-100'>On Going</p>
-                          </div>
-                          <div className='flex items-center gap-1'>
-                          <div className='h-2 w-2 rounded-full bg-stone-300'></div>
-                          <p className='text-xs font-light opacity-400'>Pending</p>
+                          <div className='flex gap-x-2 my-2'>
+                              <div className='flex items-center gap-1'>
+                              <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
+                              <p className='text-xs font-light opacity-100'>Ivan</p>
+                              </div>
+                              <div className='flex items-center gap-1'>
+                              <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
+                              <p className='text-xs font-light opacity-100'>Drajat</p>
+                              </div>
                           </div>
                       </div>
+                    </div>
                   </div>
-                  <div className='my-2 w-full md:w-[40%]'>
-                      <div className='flex gap-[2px]'>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                            <div
-                            className='bg-yellow-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                            style={{ width: `${ivanPelaporPercentage}%` }}
-                            ></div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Ivan {ivanPelaporPercentage}%</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                            <div
-                            className='bg-indigo-500 rounded h-4 transition ease-in-out delay-150 duration-300'
-                            style={{ width: `${drajatPelaporPercentage}%` }}
-                            ></div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Drajat {drajatPelaporPercentage}%</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+              </div>
+              <div className='mt-2 mb-4 w-[100%] p-0'>
+                  <div className='flex w-full'>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-yellow-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${jokoEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Joko {jokoEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-indigo-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${hanifEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Hanif {hanifEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-rose-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${ikkeEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Ikke {ikkeEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-lime-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${ariaEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Aria {ariaEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-orange-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${fatchurEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Fatchur {fatchurEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-teal-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${rifanEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Rifan {rifanEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-violet-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${evanEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Evan {evanEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-fuchsia-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${ricoEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Rico {ricoEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-sky-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${fahmiEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Fahmi {fahmiEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-gray-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${algiantEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Algiant {algiantEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-stone-400 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${ardyEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Ardy {ardyEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-emerald-400 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${bakhrulEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Bakhrul {bakhrulEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                        <div
+                        className='bg-pink-500 h-4 transition ease-in-out delay-150 duration-300'
+                        style={{ width: `${fentiEksekutorPercentage}%` }}
+                        ></div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Fenti {fentiEksekutorPercentage}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className='flex gap-x-2 my-2'>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
+                        <p className='text-xs font-light opacity-100'>Joko</p>
                       </div>
-                      <div className='flex gap-x-2 my-2'>
-                          <div className='flex items-center gap-1'>
-                          <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
-                          <p className='text-xs font-light opacity-100'>Ivan</p>
-                          </div>
-                          <div className='flex items-center gap-1'>
-                          <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
-                          <p className='text-xs font-light opacity-100'>Drajat</p>
-                          </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-indigo-500'></div>
+                        <p className='text-xs font-light opacity-100'>Hanif</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-rose-500'></div>
+                        <p className='text-xs font-light opacity-100'>Ikke</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-lime-500'></div>
+                        <p className='text-xs font-light opacity-100'>Aria</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-orange-500'></div>
+                        <p className='text-xs font-light opacity-100'>Fatchur</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-teal-500'></div>
+                        <p className='text-xs font-light opacity-100'>Rifan</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-violet-500'></div>
+                        <p className='text-xs font-light opacity-100'>Evan</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-fuchsia-500'></div>
+                        <p className='text-xs font-light opacity-100'>Rico</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-sky-500'></div>
+                        <p className='text-xs font-light opacity-100'>Fahmi</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-gray-500'></div>
+                        <p className='text-xs font-light opacity-100'>Algiant</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-stone-400'></div>
+                        <p className='text-xs font-light opacity-100'>Ardy</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-emerald-400'></div>
+                        <p className='text-xs font-light opacity-100'>Bakhrul</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <div className='h-2 w-2 rounded-full bg-pink-500'></div>
+                        <p className='text-xs font-light opacity-100'>Fenti</p>
                       </div>
                   </div>
               </div>
@@ -560,6 +874,7 @@ const TasksWeb = () => {
                       <TableHead className="text-center w-[50px]">*</TableHead>
                       <TableHead className="w-full">Project</TableHead>
                       <TableHead className="text-center w-[200px]">Pelapor</TableHead>
+                      <TableHead className="text-center w-[200px]">Eksekutor</TableHead>
                       <TableHead className="text-center w-[200px]">Status</TableHead>
                       <TableHead className="text-center w-[200px]">Aksi</TableHead>
                   </TableRow>
@@ -616,6 +931,28 @@ const TasksWeb = () => {
                               >
                                   <option value="ivan">Ivan</option>
                                   <option value="drajat">Drajat</option>
+                              </select>
+                          </TableCell>
+                          <TableCell>
+                            <select
+                                  value={task.eksekutor}
+                                  onChange={(e) => handleEksekutorChange(task.id, e.target.value)}
+                                  className="p-2 bg-transparent rounded dark:bg-black"
+                              >
+                                  <option disabled selected>Pilih</option>
+                                  <option value="joko">Joko</option>
+                                  <option value="hanif">Hanif</option>
+                                  <option value="ikke">Ikke</option>
+                                  <option value="aria">Aria</option>
+                                  <option value="fatchur">Fatchur</option>
+                                  <option value="rifan">Rifan</option>
+                                  <option value="evan">Evan</option>
+                                  <option value="rico">Rico</option>
+                                  <option value="fahmi">Fahmi</option>
+                                  <option value="algiant">Algiant</option>
+                                  <option value="ardy">Ardy</option>
+                                  <option value="bakhrul">Bakhrul</option>
+                                  <option value="fenti">fenti</option>
                               </select>
                           </TableCell>
                           <TableCell>
