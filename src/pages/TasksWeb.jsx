@@ -54,6 +54,7 @@ import "quill/dist/quill.core.css";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import parse from 'html-react-parser';
+import ScrollToTop from './ScrollToTop';
 
 const TasksWeb = () => {
     const { projectId } = useParams();
@@ -391,6 +392,7 @@ const TasksWeb = () => {
 
     return (
         <div>
+          <ScrollToTop />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

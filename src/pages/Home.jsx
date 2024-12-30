@@ -29,6 +29,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
   } from "@/components/ui/tooltip"
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Home = () => {
     const [projects, setProjects] = useState([]);

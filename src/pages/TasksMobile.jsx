@@ -53,6 +53,7 @@ import "quill/dist/quill.core.css";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import parse from 'html-react-parser';
+import ScrollToTop from './ScrollToTop';
 
 const TasksMobile = () => {
     const { projectId } = useParams();
@@ -391,6 +392,7 @@ const TasksMobile = () => {
 
     return (
         <div className="container min-h-screen py-12">
+          <ScrollToTop />
             <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
             <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4 gap-2">
                 <div className='flex flex-col w-full h-[330px]'>
