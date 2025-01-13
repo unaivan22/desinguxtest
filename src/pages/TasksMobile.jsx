@@ -76,10 +76,27 @@ const TasksMobile = () => {
         ivan: 0,
         drajat: 0,
       });
+    
+    const [eksekutorCounts, setEksekutorCounts] = useState({
+        joko: 0,
+        hanif: 0,
+        ikke: 0,
+        aria: 0,
+        fatchur: 0,
+        rifan: 0,
+        evan: 0,
+        rico: 0,
+        fahmi: 0,
+        algiant: 0,
+        ardy: 0,
+        bakhrul: 0,
+        fenti: 0,
+      });
   
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1); // Pagination state
     const itemsPerPage = 10; // Number of items per page
+    const [error, setError] = useState(false);
 
 
     const apiUrl = '/crud-api/tasks.php';
@@ -120,6 +137,13 @@ const TasksMobile = () => {
           formData.append('image', form.image);
       }
   
+      if (!form.name || form.name.trim() === "" || form.name === "<p><br></p>") {
+        setError(true);
+        setLoading(false);
+        return;
+      }
+      setError(false);
+
       axios.post(apiUrl, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((res) => {
               // Add the new task to the list
@@ -173,6 +197,22 @@ const TasksMobile = () => {
       }
   };  
 
+    const handleEksekutorChange = async (id, eksekutor) => {
+      try {
+          await axios.put(apiUrl, { id, eksekutor });
+          
+          // Update the local tasks state
+          setTasks((prevTasks) =>
+              prevTasks.map((task) =>
+                  task.id === id ? { ...task, eksekutor } : task
+              )
+          );
+      } catch (error) {
+          console.error("Failed to update eksekutor:", error);
+          alert("Failed to update eksekutor. Please try again.");
+      }
+  };  
+
     const handleDelete = (id) => {
         // Show a confirmation alert before proceeding with the delete action
         const isConfirmed = window.confirm('Yakin ingin hapus task ini?');
@@ -204,7 +244,7 @@ const TasksMobile = () => {
   
       // Make the PUT request to update the task
       const response = await axios.put(
-        `https://designtest.energeek.id/crud-api/tasks.php?project_id=${editTask.project_id}`,
+        `/crud-api/tasks.php?project_id=${editTask.project_id}`,
         updatedTask
       );
   
@@ -347,6 +387,58 @@ const TasksMobile = () => {
       const ivanPelaporPercentage = totalPelaporTasks ? (pelaporCounts.ivan / totalPelaporTasks) * 100 : 0;
       const drajatPelaporPercentage = totalPelaporTasks ? (pelaporCounts.drajat / totalPelaporTasks) * 100 : 0;
     
+      useEffect(() => {
+        // Count tasks based on status
+        const counts = { joko: 0, hanif: 0, ikke: 0, aria: 0, fatchur: 0, rifan: 0, evan: 0, rico: 0, fahmi: 0, algiant: 0, ardy: 0, bakhrul: 0, fenti: 0,};
+        tasks.forEach(task => {
+          if (task.eksekutor === 'joko') {
+            counts.joko += 1;
+          } else if (task.eksekutor === 'hanif') {
+            counts.hanif += 1;
+          } else if (task.eksekutor === 'ikke') {
+            counts.ikke += 1;
+          } else if (task.eksekutor === 'aria') {
+            counts.aria += 1;
+          } else if (task.eksekutor === 'fatchur') {
+            counts.fatchur += 1;
+          } else if (task.eksekutor === 'rifan') {
+            counts.rifan += 1;
+          } else if (task.eksekutor === 'evan') {
+            counts.evan += 1;
+          } else if (task.eksekutor === 'rico') {
+            counts.rico += 1;
+          } else if (task.eksekutor === 'fahmi') {
+            counts.fahmi += 1;
+          } else if (task.eksekutor === 'algiant') {
+            counts.algiant += 1;
+          } else if (task.eksekutor === 'ardy') {
+            counts.ardy += 1;
+          } else if (task.eksekutor === 'bakhrul') {
+            counts.bakhrul += 1;
+          } else if (task.eksekutor === 'fenti') {
+            counts.fenti += 1;
+          }
+        });
+        setEksekutorCounts(counts);
+      }, [tasks]);
+
+      // Calculate total number of tasks
+      const totalEksekutorTasks = tasks.length;
+      const jokoEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.joko / totalEksekutorTasks) * 100 : 0;
+      const hanifEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.hanif / totalEksekutorTasks) * 100 : 0;
+      const ikkeEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.ikke / totalEksekutorTasks) * 100 : 0;
+      const ariaEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.aria / totalEksekutorTasks) * 100 : 0;
+      const fatchurEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fatchur / totalEksekutorTasks) * 100 : 0;
+      const rifanEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.rifan / totalEksekutorTasks) * 100 : 0;
+      const evanEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.evan / totalEksekutorTasks) * 100 : 0;
+      const ricoEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.rico / totalEksekutorTasks) * 100 : 0;
+      const fahmiEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fahmi / totalEksekutorTasks) * 100 : 0;
+      const algiantEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.algiant / totalEksekutorTasks) * 100 : 0;
+      const ardyEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.ardy / totalEksekutorTasks) * 100 : 0;
+      const bakhrulEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.bakhrul / totalEksekutorTasks) * 100 : 0;
+      const fentiEksekutorPercentage = totalEksekutorTasks ? (eksekutorCounts.fenti / totalEksekutorTasks) * 100 : 0;
+          
+
       const formatDate = (dateString) => {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         const date = new Date(dateString);
@@ -393,30 +485,26 @@ const TasksMobile = () => {
     return (
         <div className="container min-h-screen py-12">
           <ScrollToTop />
-            <h1 className="text-2xl font-bold mb-4">Design Tasks {project ? project.name : '...'}</h1>
+          <Link to='/' className='mt-4 mb-12'><Button variant='outline' size='icon'> <ArrowLeft /></Button></Link>
+            <h1 className="text-2xl font-bold mt-4 mb-4">Design Tasks {project ? project.name : '...'}</h1>
             <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2 mb-4 gap-2">
-                <div className='flex flex-col w-full h-[330px]'>
+                <div className='flex flex-col w-full'>
                   <p className='text-sm mb-1 '>Nama Task</p>
-                  {/* <Input
-                      className="p-2 border rounded-lg"
-                      type="text"
-                      placeholder="Nama task"
+                  <div className='flex flex-col gap-2 w-full'>
+                    <ReactQuill
+                      theme="snow"
                       value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
+                      modules={{ toolbar: fullToolbarOptions }}
+                      // className="quill-editor w-full h-[220px] rounded"
+                      className={`quill-editor w-full rounded min-h-[10rem] ${error ? "border-red-500" : ""}`}
                       required
                       disabled={loading}
-                  /> */}
-                  <ReactQuill
-                    theme="snow"
-                    value={form.name}
-                    onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
-                    modules={{ toolbar: fullToolbarOptions }}
-                    className="quill-editor w-full h-[220px] rounded"
-                    required
-                    disabled={loading}
-                  />
+                    />
+                    {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
+                  </div>
                 </div>
-                <div className='flex flex-col md:flex-row gap-2 md:items-end'>
+                <div className='flex flex-col md:flex-row gap-2 mt-6 md:items-end'>
                   <div className='flex flex-col w-full'>
                     <p className='text-sm mb-1 '>Upload Gambar <span className='opacity-50'>*opsional</span></p>
                     <Input
@@ -432,7 +520,7 @@ const TasksMobile = () => {
             </form>
             <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
                 <div className='flex gap-x-2 w-full'>
-                  <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link>
+                  {/* <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link> */}
                   <Input
                       type="search"
                       placeholder="Cari tasks..."
@@ -542,97 +630,119 @@ const TasksMobile = () => {
             <p className='py-2 opacity-70'>Task Lists</p>
             <div className='grid grid-cols-1'>
             {paginatedTasks.map((task) => (
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <div className='flex flex-col gap-4 mb-3 border rounded-xl p-4'>
-                            <div className='flex'>
-                                <div
-                                    className={`w-3 h-3 rounded-full mt-2 ${
-                                        task.status === 'completed' ? 'bg-green-500' :
-                                        task.status === 'ongoing' ? 'bg-purple-500' : 'bg-stone-400'
-                                    }`}>
-                                </div>
-                                <div className='flex gap-3 items-center'>
-                                    <div>
-                                    {task.image && (
-                                        <ModalImage
-                                            small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                            large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                            // alt={task.name}
-                                            className="my-3 mx-3 w-[50px] h-[50px] object-cover rounded-lg"
-                                        />
-                                    )}
-                                    </div>
-                                    <div className='flex flex-col gap-2 w-[330px]'>
-                                        <p className='line-clamp-[1] font-medium opacity-70'><HtmlRenderer html={task.name} /></p>
-                                        <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                <Clock className='w-4 h-4 opacity-80' />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                <p>Tanggal dibuat</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                            </TooltipProvider>
-                                        {formatDate(task.created_at)}</p>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                            <div className='flex pl-6 gap-3'>
-                                <select
-                                    value={task.pelapor}
-                                    onChange={(e) => handlePelaporChange(task.id, e.target.value)}
-                                    className="p-2 border rounded dark:bg-black"
-                                >
-                                    <option value="ivan">Ivan</option>
-                                    <option value="drajat">Drajat</option>
-                                </select>
-                                <select
-                                    value={task.status}
-                                    onChange={(e) => handleStatusChange(task.id, e.target.value)}
-                                    className="p-2 border rounded dark:bg-black"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="ongoing">On Going</option>
-                                </select>
-                                <Button size='icon' variant='outline' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
-                                    
-                            </div>
+              <div className='flex flex-col gap-4 mb-3 border rounded-xl p-4'>
+                <div className='flex items-center'>
+                    <div
+                        className={`w-3 h-3 rounded-full mt-2 ${
+                            task.status === 'completed' ? 'bg-green-500' :
+                            task.status === 'ongoing' ? 'bg-purple-500' : 'bg-stone-400'
+                        }`}>
+                    </div>
+                    <div className='flex gap-3 items-center w-[90%]'>
+                        <div>
+                        {task.image && (
+                            <ModalImage
+                                small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                // alt={task.name}
+                                className="my-3 mx-3 w-[50px] h-[50px] object-cover rounded-lg"
+                            />
+                        )}
                         </div>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                          <SheetTitle className='pb-3'><Button variant='secondary' onClick={() => handleEdit(task)}> <Pencil /> Edit Task</Button></SheetTitle>
-                        </SheetHeader>
-                        <div className="grid gap-4 py-4 h-[96vh] md:h-[88vh] overflow-y-scroll">
-                            <div className='flex flex-col gap-1 md:pr-4 task-detail'>
-                                {task.image && (
-                                    <ModalImage
-                                    small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                    large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                        // alt={task.name}
-                                        className="my-2 w-auto h-full object-cover rounded-lg"
-                                    />
-                                )}
-                                <p className='text-sm mt-4 mb-4'><HtmlRenderer html={task.name} /></p>
-                            </div>
+                        <div className='flex flex-col gap-2 w-[100%]'>
+                            <p className='line-clamp-[1] font-medium opacity-70'><HtmlRenderer html={task.name} /></p>
+                            <p className='font-light text-xs opacity-70 flex items-center gap-1'> 
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                    <Clock className='w-4 h-4 opacity-80' />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                    <p>Tanggal dibuat</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                </TooltipProvider>
+                            {formatDate(task.created_at)}</p>
                         </div>
-                        {/* <SheetFooter className='py-4'>
-                            <SheetClose asChild>
-                                
-                            <Button onClick={() => handleEdit(task)}>Edit Task</Button>
-                            </SheetClose>
-                        </SheetFooter> */}
-                    </SheetContent>
-                </Sheet>
+                        
+                    </div>
+                </div>
+                <div className='flex gap-3'>
+                    <select
+                        value={task.pelapor}
+                        onChange={(e) => handlePelaporChange(task.id, e.target.value)}
+                        className="p-2  rounded dark:bg-black"
+                    >
+                        <option value="ivan">Ivan</option>
+                        <option value="drajat">Drajat</option>
+                    </select>
+                    <select
+                        value={task.status}
+                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                        className="p-2  rounded dark:bg-black"
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="ongoing">On Going</option>
+                    </select>
+                    <select
+                        value={task.eksekutor}
+                        onChange={(e) => handleEksekutorChange(task.id, e.target.value)}
+                        className="p-2 bg-transparent rounded dark:bg-black"
+                    >
+                        <option disabled selected>Pilih</option>
+                        <option value="joko">Joko</option>
+                        <option value="hanif">Hanif</option>
+                        <option value="ikke">Ikke</option>
+                        <option value="aria">Aria</option>
+                        <option value="fatchur">Fatchur</option>
+                        <option value="rifan">Rifan</option>
+                        <option value="evan">Evan</option>
+                        <option value="rico">Rico</option>
+                        <option value="fahmi">Fahmi</option>
+                        <option value="algiant">Algiant</option>
+                        <option value="ardy">Ardy</option>
+                        <option value="bakhrul">Bakhrul</option>
+                        <option value="fenti">fenti</option>
+                    </select>
+                </div>
+                <div className='flex gap-3'>
+                  <Button size='icon' variant='ghost' onClick={() => handleDelete(task.id)}><Trash2 className="h-4 w-4 text-rose-500" /></Button>
+                    <Sheet>
+                      <SheetTrigger asChild>
+                          <Button variant="outline" className='w-full'> Detail <ArrowUpRight className='w-4 h-4 ml-1' /></Button>
+                      </SheetTrigger>
+                      <SheetContent>
+                          <SheetHeader>
+                            <SheetTitle className='pb-3'><Button variant='secondary' onClick={() => handleEdit(task)}> <Pencil /> Edit Task</Button></SheetTitle>
+                          </SheetHeader>
+                          <div className="grid gap-4 py-4 h-[96vh] md:h-[88vh] overflow-y-scroll">
+                              <div className='flex flex-col gap-1 md:pr-4 task-detail'>
+                                  {task.image && (
+                                      <ModalImage
+                                      small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                      large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                          // alt={task.name}
+                                          className="my-2 w-auto h-full object-cover rounded-lg"
+                                      />
+                                  )}
+                                  <p className='text-sm mt-4 mb-4'><HtmlRenderer html={task.name} /></p>
+                              </div>
+                          </div>
+                          {/* <SheetFooter className='py-4'>
+                              <SheetClose asChild>
+                                  
+                              <Button onClick={() => handleEdit(task)}>Edit Task</Button>
+                              </SheetClose>
+                          </SheetFooter> */}
+                      </SheetContent>
+                  </Sheet>
+                </div>
+            </div>
             ))}
             </div>
 
-            <p className='text-sm font-light opacity-70 text-center mb-4'>A list of {project ? project.name : '...'} design tasks.</p>
+            <p className='text-sm font-light opacity-70 text-center mb-4'>List of {project ? project.name : '...'} design tasks.</p>
 
             {/* Pagination */}
             <Pagination>

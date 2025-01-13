@@ -204,7 +204,7 @@ const Home = () => {
                         <Input
                             className="p-2 border rounded-lg"
                             type="text"
-                            placeholder="Nama Project"
+                            placeholder="Nama Project, contoh : WMS CCE"
                             value={form.name}
                             onChange={(e) => setForm({ name: e.target.value })}
                             required

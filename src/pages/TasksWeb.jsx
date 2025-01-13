@@ -97,10 +97,11 @@ const TasksWeb = () => {
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1); // Pagination state
     const itemsPerPage = 10; // Number of items per page
+    const [error, setError] = useState(false);
 
 
     // const apiUrl = '/crud-api/tasks.php';
-    const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
+    const apiUrl = '/crud-api/tasks.php';
 
     useEffect(() => {
       const fetchData = async () => {
@@ -136,6 +137,13 @@ const TasksWeb = () => {
       if (form.image) {
           formData.append('image', form.image);
       }
+
+      if (!form.name || form.name.trim() === "" || form.name === "<p><br></p>") {
+        setError(true);
+        setLoading(false);
+        return;
+      }
+      setError(false);
   
       axios.post(apiUrl, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((res) => {
@@ -237,7 +245,7 @@ const TasksWeb = () => {
   
       // Make the PUT request to update the task
       const response = await axios.put(
-        `https://designtest.energeek.id/crud-api/tasks.php?project_id=${editTask.project_id}`,
+        `/crud-api/tasks.php?project_id=${editTask.project_id}`,
         updatedTask
       );
   
@@ -489,27 +497,26 @@ const TasksWeb = () => {
           <div className="container min-h-screen py-12">
               <h1 className="text-2xl font-bold my-4">Design Tasks {project ? project.name : '...'}</h1>
               <form onSubmit={handleSubmit} className="flex flex-col gap-6 pt-4 pb-8 mb-8 border-b items-start">
-                  <div className='flex w-full items-start min-h-[260px]'>
+                  <div className='flex w-full items-start '>
                     <p className='text-sm mb-1 w-[300px]'>Nama Task</p>
-                    {/* <Textarea
-                        className="p-2 border rounded-lg"
-                        type="text"
-                        placeholder="Detail task"
+                    <div className='flex flex-col gap-2 w-full'>
+                      <ReactQuill
+                        theme="snow"
                         value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
+                        modules={{ toolbar: fullToolbarOptions }}
+                        // className="quill-editor w-full h-[220px] rounded"
+                        className={`quill-editor w-full rounded min-h-[10rem] ${error ? "border-red-500" : ""}`}
                         required
                         disabled={loading}
-                    /> */}
-                    <ReactQuill
-                      theme="snow"
-                      value={form.name}
-                      onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
-                      modules={{ toolbar: fullToolbarOptions }}
-                      className="quill-editor w-full h-[220px] rounded"
-                      required
-                      disabled={loading}
-                    />
+                      />
+                      {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
+                    </div>
                   </div>
+                  {/* <div className='flex w-full items-start'>
+                    <p className='text-sm mb-1 w-[300px] invisible'>Nama Task</p>
+                    {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
+                  </div> */}
                   <div className='flex w-full items-center'>
                       <p className='text-sm mb-1 w-[300px]'>Upload Gambar <span className='opacity-50'>*opsional</span></p>
                       <Input
@@ -1016,7 +1023,7 @@ const TasksWeb = () => {
                   </TableBody>
               </Table>
 
-              <p className='text-sm font-light opacity-70 text-center mb-4'>A list of {project ? project.name : '...'} design tasks.</p>
+              <p className='text-sm font-light opacity-70 text-center mb-4'>List of {project ? project.name : '...'} design tasks.</p>
 
               {/* Pagination */}
               <Pagination>
