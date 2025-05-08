@@ -55,6 +55,12 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import parse from 'html-react-parser';
 import ScrollToTop from './ScrollToTop';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const TasksWeb = () => {
     const { projectId } = useParams();
@@ -496,44 +502,51 @@ const TasksWeb = () => {
           </TooltipProvider>
           <div className="container min-h-screen py-12">
               <h1 className="text-2xl font-bold my-4">Design Tasks {project ? project.name : '...'}</h1>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-6 pt-4 pb-8 mb-8 border-b items-start">
-                  <div className='flex w-full items-start '>
-                    <p className='text-sm mb-1 w-[300px]'>Nama Task</p>
-                    <div className='flex flex-col gap-2 w-full'>
-                      <ReactQuill
-                        theme="snow"
-                        value={form.name}
-                        onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
-                        modules={{ toolbar: fullToolbarOptions }}
-                        // className="quill-editor w-full h-[220px] rounded"
-                        className={`quill-editor w-full rounded min-h-[10rem] ${error ? "border-red-500" : ""}`}
-                        required
-                        disabled={loading}
-                      />
-                      {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
-                    </div>
-                  </div>
-                  {/* <div className='flex w-full items-start'>
-                    <p className='text-sm mb-1 w-[300px] invisible'>Nama Task</p>
-                    {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
-                  </div> */}
-                  <div className='flex w-full items-center'>
-                      <p className='text-sm mb-1 w-[300px]'>Upload Gambar <span className='opacity-50'>*opsional</span></p>
-                      <Input
-                          className="p-2 border rounded-lg w-full"
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-                          disabled={loading}
-                      />
-                  </div>
-                  <div className='flex w-full items-center'>
-                      <p className='text-sm mb-1 w-[300px] invisible'>Aksi</p>
-                      <div className='w-full'>
-                        <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
+              <Accordion type="single" collapsible className="w-full my-8">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Tambah Task</AccordionTrigger>
+                  <AccordionContent>
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 pt-4 pb-8 items-start">
+                      <div className='flex w-full items-start '>
+                        <p className='text-sm mb-1 w-[300px]'>Nama Task</p>
+                        <div className='flex flex-col gap-2 w-full'>
+                          <ReactQuill
+                            theme="snow"
+                            value={form.name}
+                            onChange={(value) => setForm({ ...form, name: value })} // Directly use the value
+                            modules={{ toolbar: fullToolbarOptions }}
+                            // className="quill-editor w-full h-[220px] rounded"
+                            className={`quill-editor w-full rounded min-h-[10rem] ${error ? "border-red-500" : ""}`}
+                            required
+                            disabled={loading}
+                          />
+                          {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
+                        </div>
                       </div>
-                  </div>
-              </form>
+                      {/* <div className='flex w-full items-start'>
+                        <p className='text-sm mb-1 w-[300px] invisible'>Nama Task</p>
+                        {error && <p className="text-red-500 text-sm w-full">Nama Task is required.</p>}
+                      </div> */}
+                      <div className='flex w-full items-center'>
+                          <p className='text-sm mb-1 w-[300px]'>Upload Gambar <span className='opacity-50'>*opsional</span></p>
+                          <Input
+                              className="p-2 border rounded-lg w-full"
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                              disabled={loading}
+                          />
+                      </div>
+                      <div className='flex w-full items-center'>
+                          <p className='text-sm mb-1 w-[300px] invisible'>Aksi</p>
+                          <div className='w-full'>
+                            <Button className="rounded-lg" disabled={loading}> {loading && <Loader className="animate-spin mr-2 h-4 w-4" /> } Tambah Task</Button>
+                          </div>
+                      </div>
+                  </form>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               <div className='flex flex-col md:flex-row w-full gap-x-4 items-start'>
                   <div className='flex gap-x-2 w-[80%]'>
                     {/* <Link to='/'><Button variant='outline'> <ArrowLeft className='w-4 h-4 mr-2' /> Back</Button></Link> */}
@@ -903,8 +916,8 @@ const TasksWeb = () => {
                                   <div>
                                   {task.image && (
                                       <ModalImage
-                                          small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                          large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                          small={`/crud-api/uploads/${task.image}`}
+                                          large={`/crud-api/uploads/${task.image}`}
                                           // alt={task.name}
                                           className="my-2 w-[50px] h-[50px] object-cover rounded-lg"
                                       />
@@ -996,8 +1009,8 @@ const TasksWeb = () => {
                                           <div className='flex flex-col gap-1 md:pr-4 task-detail'>
                                               {task.image && (
                                                   <ModalImage
-                                                    small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                                    large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                                    small={`/crud-api/uploads/${task.image}`}
+                                                    large={`/crud-api/uploads/${task.image}`}
                                                       // alt={task.name}
                                                       className="my-2 w-auto h-full object-cover rounded-lg border"
                                                   />
@@ -1090,17 +1103,10 @@ const TasksWeb = () => {
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 pb-4 h-[380px]">
-                {/* <Textarea
-                  label="Task Name"
-                  value={editedName}
-                  onChange={(e) => setEditedName(e.target.value)}
-                  placeholder="Task name"
-                  required
-                /> */}
                 <ReactQuill
                   theme="snow"
-                  value={editedName} // Bind the current value
-                  onChange={(value) => setEditedName(value)} // Update state directly with the new value
+                  value={editedName}
+                  onChange={(value) => setEditedName(value)} 
                   placeholder="Task name"
                   modules={{ toolbar: fullToolbarOptions }}
                   className="quill-editor h-[300px]"

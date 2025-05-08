@@ -100,7 +100,7 @@ const TasksMobile = () => {
 
 
     const apiUrl = '/crud-api/tasks.php';
-    // const apiUrl = 'https://designtest.energeek.id/crud-api/tasks.php';
+    // const apiUrl = '/crud-api/tasks.php';
 
     useEffect(() => {
       const fetchData = async () => {
@@ -642,8 +642,8 @@ const TasksMobile = () => {
                         <div>
                         {task.image && (
                             <ModalImage
-                                small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                small={`/crud-api/uploads/${task.image}`}
+                                large={`/crud-api/uploads/${task.image}`}
                                 // alt={task.name}
                                 className="my-3 mx-3 w-[50px] h-[50px] object-cover rounded-lg"
                             />
@@ -720,8 +720,8 @@ const TasksMobile = () => {
                               <div className='flex flex-col gap-1 md:pr-4 task-detail'>
                                   {task.image && (
                                       <ModalImage
-                                      small={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
-                                      large={`https://designtest.energeek.id/crud-api/uploads/${task.image}`}
+                                      small={`/crud-api/uploads/${task.image}`}
+                                      large={`/crud-api/uploads/${task.image}`}
                                           // alt={task.name}
                                           className="my-2 w-auto h-full object-cover rounded-lg"
                                       />

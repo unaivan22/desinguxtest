@@ -30,6 +30,7 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
 import { motion, AnimatePresence } from 'framer-motion';
+import ClearCookies from './ClearCookies';
 
 const Home = () => {
     const [projects, setProjects] = useState([]);
@@ -42,7 +43,7 @@ const Home = () => {
     const [tasksCount, setTasksCount] = useState({});
 
     // const apiUrl = '/crud-api/index.php';
-    const apiUrl = 'https://designtest.energeek.id/crud-api/index.php';
+    const apiUrl = '/crud-api/index.php';
 
     useEffect(() => {
         axios.get(apiUrl).then((res) => setProjects(res.data));
@@ -189,7 +190,8 @@ const Home = () => {
                 <div className='flex items-center gap-x-2'>
                     <img src='/e.svg' className='w-8' />
                     <h1 className="text-2xl font-bold">Energeek - Design Testing </h1> 
-                    <ModeToggle />
+                    {/* <ModeToggle /> */}
+                    <ClearCookies />
                 </div>
                 <div className='flex flex-col md:flex-row items-center gap-4 md:gap-x-24 my-6 w-full'>
                     <Input
